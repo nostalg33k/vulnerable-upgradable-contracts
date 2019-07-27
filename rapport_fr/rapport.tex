@@ -1,0 +1,337 @@
+\documentclass{report}
+
+\usepackage{siunitx} % Provides the \SI{}{} and \si{} command for typesetting SI units
+\usepackage{graphicx} % Required for the inclusion of images
+\usepackage{natbib} % Required to change bibliography style to APA
+\usepackage{amsmath} % Required for some math elements 
+\usepackage{url}
+\usepackage{csquotes}
+\MakeOuterQuote{"}
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+\usepackage[latin1]{inputenc} % un package
+\usepackage[T1]{fontenc}      % un second package
+\usepackage[francais]{babel}  % un troisième package
+
+\renewcommand{\labelenumi}{\alph{enumi}.} % Make numbering in the enumerate environment by letter rather than number (e.g. section 6)
+
+\setlength{\parindent}{3em}
+\setlength{\parskip}{0em}
+
+%\usepackage{times} % Uncomment to use the Times New Roman font
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{Rapport de PFE } % Title
+
+\author{Ange \textsc{Andries}} % Author name
+
+\date{\today} % Date for the report
+
+\begin{document}
+
+\maketitle % Insert the title, author and date
+
+
+%----------------------------------------------------------------------------------------
+%	SECTION 1
+%----------------------------------------------------------------------------------------
+
+\section{Résumé}
+
+Ethereum est actuellement la blockchain la plus populaire auprès des entreprises et des gouvernements. Parmi le top 50 des entreprises valorisées à plus d'1 milliards de dollars, 24 développent actuellement sur la blockchain Ethereum, tandis que 12 utilisent des plateformes dérivées.\cite{ref1} Ethereum est un écosystème utilisant la technologie blockchain qui fournit non seulement une plateforme pour les transactions de cryptomonnaies mais également pour le développement de \enquote*{smart contracts} ou \enquote*{contrats intelligents}, qui sont des programmes pouvant être stockés, appelés et exécutés sur la blockchain. Ces programmes sont immuables, ce qui signifie que ni l'adresse ni le code d'un contrat déployé ne peuvent être modifiés. Cependant, ces contrats intelligents peuvent également appeler et envoyer Ether à d'autres contrats, plusieurs approches et modèles peuvent alors être utilisés pour créer des \enquote*{contrats intelligents évolutifs} pouvant compromettre les principes d'immuabilité et de \enquote*{trustlessness} de la blockchain. Compte tenu de leur capacité à manipuler et à contenir des cryptomonnaies, les contrats évolutifs doivent être utilisés avec prudence car ils peuvent notamment donner la possibilité au propriétaire de le mettre à niveau vers une version malveillante afin de voler ou de geler des fonds.
+Dans ce rapport, nous aborderons les techniques utilisées afin de créer des contrats évolutifs et quantifierons l'utilisation de ces contrats au sein d'un jeu de données issues de la blockchain Ethereum. 
+
+
+ \section{Abstract}
+  Ethereum is currently the most popular blockchain for companies and government to experiment with, as 24 of the top 50 billion-dollar organizations are currently experimenting with Ethereum public blockchains while 12 are using Ethereum-derived blockchains platforms.\cite{ref1} Ethereum is a blockchain ecosystem that provides both a public ledger for cryptocurrencies transactions as well as smart contracts, programs that can be stored, called and executed on the blockchain. Contracts are immutable, meaning the address and code of a deployed contract cannot be changed. Although, because smart contracts can interact with other contracts, several approaches and patterns can be used to create  \enquote{upgradeable smart contracts} , compromising the blockchain immutability and trustlessness. Given their ability to manipulate and hold funds, upgradeable contracts should be used only when necessary as it gives the owner of the contract the ability to upgrade it to a malicious version in order to steal or freeze funds. 
+In this paper, we address this problem and quantify the proportion of upgradeable contracts with available source code using the Proxy pattern with a dataset from Ethereum blockchain.
+
+ \tableofcontents
+	\chapter{Introduction}
+		\section{Contexte et objectifs}
+			\subsection{Présentation du laboratoire SEFCOM}
+			
+J?ai effectué mon stage en tant qu'assistante de recherche au sein du laboratoire SEFCOM (Laboratory of Security Engineering for Future Computing) à ASU (Arizona State University).
+\par
+ASU est une des plus importantes universités publiques des États-Unis avec 5 campus et plus de 80000 étudiants inscrits en 2018. Elle fait partie des meilleures universités de recherche avec un budget estimé à 604 millions de dollars pour l'année 2018 et a été classée au premier rang des écoles les plus innovantes des États-Unis en 2019 pour la quatrième année consécutive.
+\par
+Le laboratoire fait ainsi partie des 30 laboratoires du département CIDSE (School of Computing, Informatics, and Decision Systems Engineering) et se concentre sur deux domaines: la cybersécurité et la cyberdéfense. 
+Les travaux de recherche portent sur de nombreux sujets tels que la gestion d'identité et le contrôle d'accès, l'informatique légale, le cloud computing, la création de modèles formels, la sécurité des réseaux et des systèmes distribués ainsi que celle des technologies mobiles.
+Il est ainsi sponsorisé par des organismes tels que l'US National Science Foundation, the US Department of Energy, Bank of America, Microsoft, Google, CISCO, ou encore la NSA.
+\par
+De nombreux profils se côtoient au sein du laboratoire, on y trouve ainsi des post-doctorants, des doctorants, des professeurs, des alumnis, des stagiaires ainsi que des étudiants de Master et Bachelors. 
+
+Les 4 professeurs en charge du laboratoire sont Yan Shoshitaishvili (connu sous le pseudo de Zardus), Adam Doupé (adamd), Ruoyu Fish Wang (fish), and Tiffany Bao. Tous les 4 se distinguent dans leurs domaines avec plus d'une centaine de publications à leur actif. De plus, ils participent très régulièrement à des CTF, ces compétitions de sécurité informatique consistant à exploiter des vulnérabilités afin s'introduire dans un système pour y récupérer le drapeau (flag), en tant que joueurs ou organisateurs aux sein des équipes Shellphish, pwndevils (l'équipe d'ASU) et Order of the Overflow. Ils organisent actuellement la convention DEF CON, la plus importante convention de cybersécurité au monde et font partie des créateurs d'angr, framework d'analyse de programmes binaires et outil bien connu des CTFers. 
+C'est donc sans surprise que la participation aux CTF fait partie intégrante des activités du laboratoire.
+
+Une autre activité est le \enquote{reading group}  qui est une réunion hebdomadaire durant laquelle un membre du laboratoire présente un papier de recherche qu'il aura sélectionné.  
+
+				\paragraph{Organisation et suivi des projets}
+\par
+Chaque individu travaille sur son propre projet, parfois en collaboration avec une autre personne plus expérimentée qui agit en qualité de tuteur.
+
+Chaque jeudi se tient une réunion au cours de laquelle chacun informe les autres membres du laboratoire des avancées de son projet, ses besoins, les difficultés qu'il rencontre etc. Il est également possible de réserver des \enquote{Office Hours}  qui sont des réunions de 20 minutes environ afin de discuter du projet en privé avec les professeurs de manière plus détaillée.
+
+Le laboratoire utilise également la plateforme Slack pour faciliter la communication et la plateforme Trello pour le suivi des projets où chacun dispose de sa carte qui doit être mise à jour chaque semaine et qui inclut la possibilité de contenir des liens, listes, pièces jointes, rappels et deadlines, etc..
+
+			\subsection{Présentation du projet}
+
+\paragraph{Intitulé original du projet: Security Analysis of Smart Contracts}
+
+\fbox{
+   \begin{minipage}{\textwidth}
+\textit{Blockchain technology is quickly evolving and the needs for security are fundamental to its adoption. One of the main features of the Ethereum blockchain is smart contracts. A smart contract is a piece of executable code that runs on the decentralized network of the blockchain and allows a transaction between two parties without involving a trusted intermediary. Prior to execution, smart contract code is complied into bytecode of the EVM (Ethereum Virtual Machine). As a smart contract cannot be modified after it is deployed on the blockchain, we must assure its correctness before deployment. }
+
+\textit{This research project aims to perform security analysis of smart contracts on the Ethereum blockchain. Specifically, this project will focus on the discovery of security vulnerabilities related to multi-party transactions, timing-related logical issues, and re-entrancy issues. This project will involve using and improving symbolic execution engines that are designed for analyzing smart contracts, such as Manticore. The novelty of this research project includes the extraction and recovery of state machines in smart contracts, building a simulation environment for analyzing multi-party smart contract computations, and efficient graph-based vulnerability discovery. }
+
+\end{minipage}%
+}
+
+\paragraph{Adéquation du projet}
+Grâce au module PX510, j'ai eu l'occasion de me pencher sur les technologies de blockchain et de smart contracts. Le module m'a permis de découvrir le fonctionnement de la blockchain, comment interagir avec cette dernière mais surtout ce que cette technologie apporte et les problématiques auxquelles elle répond. Ce sujet de stage a donc été une bonne opportunité d'en apprendre davantage sur cette technologie en plein essor ainsi que sur le domaine de la sécurité en général. 
+De plus, effectuer mon projet de fin d'étude dans un laboratoire m'a éclairé sur ce qu'est la recherche en laboratoire et m'a permis de prendre ma décision sur ma poursuite en thèse. Ce stage a été également l'occasion de travailler aux côtés de chercheurs reconnus dans le monde de la cybersécurité aux côtés d'autres stagiaires et doctorants étrangers dans un contexte international et de valider mon expérience à l'étranger. 
+\paragraph{Evolution du projet}
+
+Au fur et à mesure de mon stage, le sujet a été amené a évolué compte tenu de mes interêts, du temps qui m'était imparti et de l'état de la recherche actuelle. 
+L'idée de base du projet était de travailler sur un outil permettant de découvrir des vulnérabilités dans les smart contracts, en se basant sur le principe des machines à états finis. La littérature comporte de nombreux papiers décrivant les vulnérabilités les plus communes et proposant des outils d'analyse de smart contracts \cite{perez2019smart}. La plupart de ces outils utilisent l'execution symboliques ou l'analyse statique pour détecter ces vulnérabilités, cependant certains travaux utilisent la vérification formelle et offrent plus particulièrement un moyen de générer des smart contracts en les modélisant comme des machines à état finis  \cite{suvorov2019smart}\cite{mavridou2019verisolid}.
+
+Ces lectures m'ont permis de comprendre les vulnérabilités existantes et comment les exploiter d'un point de vue théorique. Ces vulnérabilités seront abordées plus en détail dans la section 2.2.
+Au niveau pratique, je me suis entrainé à exploiter les smart contracts du wargame Ethernaut \cite{ethernaut}  où chaque niveau correspond à un smart contract comportant une vulnérabilité en déployant des smart contracts \enquote{exploit}  ou en utilisant directement l'API web3js.
+
+Pour me familiariser avec cette technologie, j'ai également déployé ma propre blockchain et mes propres smart contracts en local en utilisant les framework Truffle et Ganache \cite{truffle}. A la suite de mes lectures, expérimentations et découvertes et de discussions avec les professeurs, je me suis renseigné sur l'obfuscation de code et la possibilité d'insertion de backdoors au sein des smart contracts. 
+Les techniques classiques d'obfuscation et d'insertion de backdoors n'étant pas applicables sur le nouveau paradigme que constitue les smart contracts, je me suis renseignée sur les protocoles Zero-Knowledge Proofs \cite{feige1988zero} et Multi Party Computations \cite{yao1982protocols}.
+Ces des protocoles cryptographiques permettraient éventuellement de rendre confidentiel le contenu des transactions tout en assurant leur validité. Ils permettraient également d'améliorer la scalabilité, à l'instar du protocole ZK Snarks \cite{zksnarks} en cours de développement sur la blockchain Ethereum.
+Cependant, le principe de la blockchain garantit que le bytecode des smart contracts soit public et les développeurs sont vivement encouragé à divulguer leur code source (dans un langage haut niveau tel que Vyper ou Solidity) pour encourager l'utilisateur à utiliser leurs contrats.
+Une tendance adoptée par les développeurs permet néanmoins de mettre à jour les fonctionnalités de leur contrat en séparant la logique des données à l'aide d'un contrat \enquote{Proxy} , ce qui pourrait permettre à un développeur malintentionné de rediriger l'utilisateur vers un contrat malicieux. 
+\textbf{Après avoir eu une approche expérimentale afin d'identifier le fonctionnement et les vulnérabilités sur ce type de contrat, je me suis tournée vers une démarche empirique afin de mesurer la proportion et l'utilisation de ces contrats évolutifs sur la blockchain Ethereum. La méthodologie est détaillée au chapitre 3 de ce rapport.}
+
+
+	\subsection{Estimation financière et enjeux }
+Les coûts sont estimés sur la durée du stage: 5 mois et 5 jours soit 158 jours au total. Les abréviations utilisés pour définir le type de coût sont:
+
+\begin{description}
+  \item[CDI] Coût direct identifié: Coûts explicitement identifiés exclusivement réservé au projet
+  \item[CDE] Coût direct estimé: Coûts estimés et en rapport direct avec le projet 
+  \item[IND] Coût indirect: Coûts non directement attribuables au projet mais nécessaires
+\end{description}
+\bigskip
+\newcolumntype{M}[1]{>{\raggedright}m{#1}}
+
+\begin{tabular}{|c|M{7cm}|c|}
+  \hline
+  Type de coût& Description & Coût \\
+  \hline
+   CDI & Gratification de \enquote*{Research/Lab Aid}  & \$9691 \\
+   \hline
+     CDI & Frais engendré par le visa J-1&  \$3,982 \\
+  \hline
+  CDI & Salaires d'\enquote*{Assistant Professor} estimés sur le salaire perçu par chaque professeur en 2018  \$425000*0.43 &\$182750 \\
+  \hline
+    CDI & Utilisation du service BigQuery en période d'essai. Requêtes \$5.00 par TB (premier TB gratuit chaque mois) + \$300 de requêtes pour la période d'essai & \$305\\
+   \hline
+  CDE & Temps alloué par les professeurs: Réunion hebdomadaire (22*1 heure) & \$1067,35 \\
+    \hline
+  CDE & Temps alloué par les professeurs: Office hours (5*20 minutes) & \$82,5\\
+      \hline
+  CDE & Bureau, chaise, équipement informatique & \$1500 \\
+      \hline
+  IND & F\&A: Facilities and Administrative costs. Basé sur un taux de 56.5\% appliqué aux dépenses dédiées à la recherche de l'année 2017 du département CIDSE (\$17.2M)   & \$9718000 \\
+  	\hline
+    & \textbf{Coût total}& \$9917377.85 \\
+      	\hline
+\end{tabular}
+\bigskip
+
+
+La blockchain est une technologie attisant aussi bien l'intérêt des chercheurs que des gouvernements et entreprises. Elle représente en effet un intérêt fort pour ces dernières\cite{ref1}, de part ses différentes propriétés qui permettent par exemple de mettre en place une comptabilité inviolable, un contrôle d'accès, d'identité, de stock etc. Les possibilités sont très nombreuses et beaucoup intègre la blockchain dans leur processus de transformation numérique, en expérimentant des blockchains privées. D'autres se spécialisent dans le développement de DApps, ces applications décentralisées stockées sur la blockchain. Le marché de ces applications représenterait plus de 2500 applications et plus de 2.5 millions de dollars. \cite{dapps}
+Les géants du web ne sont pas en reste puisque Facebook prévoit notamment de lancer sa propre cryptomonnaie Libra en 2020\cite{libra}.
+Au niveau du marché du travail, la demande progresse et les profils spécialisés sont de plus en plus recherchés et sollicités.
+En attendant sa démocratisation, c'est aux chercheurs qu'incombent la tâche de résoudre les enjeux liés à cette technologie, notamment en terme de scalabilité et de sécurité. 
+
+	\chapter{La blockchain Ethereum et les smart contracts}
+Cette section présente le fonctionnement de la blockchain Ethereum, de l'EVM (Ethereum Virtual Machine) et des smart contracts. Pour une présentation générale de la blockchain, se référer à l'Annexe A. 
+	\section{L'écosystème Ethereum}
+Lancé en décembre 2013 par Vitalik Buterin sous la forme d'un livre blanc puis formalisé par Gavin Wood en 2014 dans le \enquote{Yellow Paper}  \cite{wood2014ethereum},  Ethereum est actuellement le deuxième plus grand écosystème blockchain derrière Bitcoin avec une capitalisation boursière supérieure à 22 milliards de dollars en juillet 2019 \cite{cap}. Tout comme Bitcoin, il s'appuie également sur une blockchain publique et sa principale cryptomonnaie est l'Ether (ETH) mais de nombreuses autres cryptomonnaies ou tokens (cf. section 3.3.1) sont également échangés sur la plateforme.
+La particularité de la blockchain Ethereum est qu'elle permet non seulement aux utilisateurs d'interagir entre eux et de stocker leurs transactions mais également de créer et d'interagir avec des programmes appelés \enquote{smart contract} .  
+On distingue alors deux types de \enquote{compte} qui permettent d'interagir avec la blockchain mais également de contenir un solde d'Ether.
+\begin{description}
+  \item[EOA: External Owned Account]  Ils sont contrôlés par les utilisateurs à l'aide d'une clé publique et une clé privée.
+  \item[Contract Account] C'est ce qu'on appelle les smarts contracts. Ils sont contrôlés par leur code. 
+  \end{description}
+  
+ Un compte, quelqu'en soit le type, est un mapping entre son adresse (160 bits) et son état qui est constitué de 4 éléments:
+ \begin{description}
+  \item[nonce]  Le nonce d'un EOA correspond à son nombre de transactions effectués. Le nonce d'un contrat correspond au nombre de contrats qu'il a créé. 
+    \item[balance]  Le solde d'Ether détenu.
+  \item[storage] Vide dans le cas d'un EOA, il s'agit d'un dictionnaire qui store des valeurs de 32 octets avec des clés de 32 octets pour un contrat.
+    \item[code]  Il correspond au hash du bytecode du contrat. Il est vide dans le cas d'un EOA.
+  \end{description}
+ 
+La blockchain peut être vue comme l'état de tous les comptes à un instant donné. Cet état est stocké dans une structure de donnée appelée Merkle Patricia Tree dont le hash du noeud racine est stocké dans chaque bloc ajouté à la chaine. Ainsi, l'état de cette dernière peut être vérifié sans avoir à télécharger la chaîne au complet. 
+
+Les comptes peuvent interagir entre eux via des messages pouvant prendre plusieurs formes; la forme apparaissant explicitement sur la blockchain est appelée transaction. Un utilisateur émet une transaction afin de créer de nouveau contrats, d'invoquer une fonction dans un contrat ou de transférer de l'Ether. Il s'agit donc d'une opération qui change l'état du réseau: chaque transaction est partagée dans le réseau, vérifiée par les mineurs et si elle est valide, ajoutée à un bloc. Une transaction est signée par son émetteur (elle ne peut être émise par un contrat)  et contient une charge utile (qui peut être nulle dans le cas d'un simple transfert de fond par exemple), l'adresse du destinataire ainsi qu'un montant d'Ether (qui peut être 0). 
+
+
+Pour dissuader les utilisateurs d?exécuter des contrats de manière abusive, de gaspiller les ressources du réseau et afin de prévenir les attaques en déni de service, ces transactions nécessitent le paiement d'un certain montant de "gas", proportionnel à la quantité d'énergie nécessaire pour exécuter la transaction. Ainsi, dans chaque transaction, l'émetteur définit la  \enquote{gas limit} et le \enquote{gas price}, respectivement la quantité maximale de gas qu?il est prêt à dépenser pour une transaction et le prix qu?il paiera pour chaque unité de gas.
+Ce gas permettra de rémunérer les mineurs traitant la transaction: plus la rémunération est élevée, plus la transaction sera traitée rapidement. 
+
+
+		\subsection{Les smart contracts}
+Les smart contracts ou contrats intelligents sont des programmes informatiques stockés sur la blockchain et permettant de réaliser un contrat, une transaction, entre plusieurs parties de manière autonome. On parle de contrat intelligent car ils facilitent l?exécution d?un contrat en vérifiant automatiquement que toutes les conditions sont respectées. Ils permettent ainsi de s?affranchir d?une entité tierce (une banque, une agence de voyage,...).
+
+\paragraph{Création d'un smart contract}
+Les smarts contracts peuvent être programmés à l'aide plusieurs langages de programmation haut niveau, Solidity\cite{solidity} est le langage historique créé par G. Wood et le plus utilisé actuellement, sa syntaxe se rapproche de Javascript, C++ et Python. Le langage est quasi Turing-Complet et la quantité de calcul est seulement limitée par la quantité de "gas" envoyé avec la transaction.
+
+Le code est ensuite compilé avec la version du compileur solc mentionnée dans le contrat. Le bytecode obtenu correspond alors au code d'initialisation du contrat. Afin de déployer le contrat sur la blockchain, l'utilisateur envoie ce code dans une transaction qui est ensuite broadcastée au réseau. Les mineurs vérifient la validité de la transaction en exécutant le code dans leur machine virtuelle, ce processus retourne le code qui sera effectivement stocké dans le contrat et initialise ses variables. Le premier mineur à résoudre la preuve de travail ajoute son bloc contenant la transaction à la blockchain. 
+Le contrat est alors déployé sur la blockchain et reçoit son adresse permanente. Cette adresse est créé en hashant l'adresse du compte du créateur du contrat et son nonce, assurant l'unicité de l'adresse. Il n'y a ainsi aucun moyen de redéployer un contrat à la même adresse, ni de changer son code ce qui rend le contrat immuable. 
+
+TODO EXEMPLE 
+
+\paragraph{Exécution d'un smart contract}
+Il est possible d'interagir avec un contrat en faisant appel aux fonctions de son ABI (Application Binary Interface). Lors la réception d'une transaction d'un EOA ou d'un message provenant d'un autre contrat, le code du contrat est alors exécuté. Selon la fonction invoquée, il peut identifier la source du message, appeler d'autres contrats, modifier l'état de ses variables, transférer des cryptomonnaies etc. Toutes les étapes de l'exécution sont effectuées indépendamment de manière déterministe dans l'EVM de chaque n?ud du réseau. 
+
+		\subsection{EVM: Ethereum Virtual Machine}
+L'EVM est la machine virtuelle permettant d'exécuter le bytecode des smarts contracts sur chaque noeud du réseau. Il s'agit d'un environnement complètement isolé, sans accès au réseau ou aux processus de l'ordinateur sur lequel elle fonctionne. Elle dispose d'une architecture basée sur une pile et dispose d'éléments volatiles comme la mémoire ainsi que d'éléments persistants, le storage et le code.
+
+TO DO FIGURE ARCHITECTURE
+
+\paragraph{Opcodes}
+
+Le bytecode des smarts contracts correspond en fait à l'encodage d'opcodes et de variables. L'EVM interprète ces opcodes pour exécuter les tâches du contrat. Actuellement, le set d'instructions est composé de 150 opcodes auxquels sont associés une quantité de gas, basé sur la quantité de ressources nécessaire à leurs exécution. 
+
+
+Un des opcodes qui nous intéresse particulièrement est DELEGATECALL. Il s'agit d'une variante de l'instruction CALL , permettant à un contrat d'envoyer un message à un autre contrat. La différence est que la fonction appelée est exécutée dans le contexte de du contrat appelant à la manière d'une librairie. Le fonctionnement de cette instruction est abordée plus en détail dans la section 2.3.4.
+
+TODO inside the evm 
+
+	\section{Sécurité et vulnérabilités}
+Bien que sécurisée par des algorithmes cryptographiques et consensuels, la blockchain n?est pas sans faille. Parce que les smart contract sont écrits par des humains et qu'ils ne peuvent être modifiés une fois déployé dans la blockchain, la sécurité joue un rôle majeur dans le développement de telles applications. Plusieurs vulnérabilités ont été découvertes et exploitées ces dernières années. 
+
+La taxonomie ci-dessous est fréquemment citée et regroupe les vulnérabilités en fonction du niveau architectural où la vulnérabilité se produit: dans le langage de programmation, le bytecode EVM ou en raison de caractéristiques générales de la blockchain.
+
+
+Deux des attaques les plus importantes et les plus célèbres sur la blockchain Ethereum sont l?attaque de The DAO et l'attaque du wallet Parity.
+
+ \paragraph{L'attaque DAO} The DAO était un projet ayant pour but de créer un outil de financement à l'aide de smart  contracts. Le projet rencontre rapidement du succès et collecte rapidement près de 150 millions de dollars. En juin 2016, un attaquant a utilisé une vulnérabilité de réentrance afin de dérober l'équivalent de 50 millions de dollars. Comme nous l'avons vu précédemment, l'une des fonctionnalités des contrats intelligents Ethereum est la possibilité d'appeler et d'utiliser le code d'autres contrats externes. L'attaquant a utilisé cette possibilité pour rappeler récursivement la fonction permettant de retirer les fonds, avant que la première exécution ne soit terminée. Cet évènement sera à l'origine de la division de la communauté Ethereum en deux blockchain distinctes: Ethereum et Ethereum Classic.
+ 
+ \paragraph{L'attaque du wallet Parity}Le wallet Parity était un contrat multi-signatures utilisant une bibliothèque externe, un autre contrat dans lequel toutes les fonctions étaient publiques et invocables par n?importe qui, y compris la fonction d?initialisation, que l?attaquant a utilisé afin de changer les propriétaires du contrat. Il a ensuite appelé la fonction "selfdestruct" permettant de désactiver le contrat, . TODO 
+
+		
+	\section{Upgradeable smart contracts}
+Cette section résumera les différentes méthodes qui existent pour créer un contrat évolutif et s'attardera plus particulièrement sur le pattern Proxy puisque c'est sur celui ci que portes les mesures présentée dans la section 3.
+
+			\subsection{Le pattern \enquote*{Owner}}
+			
+	
+			\subsection{Le pattern \enquote*{Registry}}
+
+d
+			\subsection{Le pattern \enquote*{Proxy}}
+			
+d
+			\subsection{Vulnérabilités}
+				\paragraph{Delegatecall}
+				\paragraph{Function selector}
+				
+			\subsection{Recommandations}
+			d
+
+	\chapter{Méthodologie}
+Dans cette section est décrite la méthodologie utilisée, en commençant par le choix du jeu de données puis la présentation des outils et méthodes utilisés pour la collecte et le filtrage de ce dernier, les mesures effectuées et les résultats obtenus.
+		\section{Jeu de données}
+
+				\paragraph{Utilisation de Google BigQuery}
+				
+BigQuery est un SaaS web RESTful qui permet l'analyse interactive massive de grands ensembles de données en collaboration avec l'espace de stockage Google.
+Les requêtes peuvent être écrites en SQL legacy ou en SQL standard. Cet outils google permet d'analyser les données situées dans un entrepôt logique. Un entrepôt logique peut contenir des datasets qui sont équivalents au bases de données. Les datasets peuvent contenir des tables ou des vues. 
+
+				\paragraph{Bloxy}
+		\section{Collecte des données}
+			\subsection{Critères de sélection}
+						\paragraph{Récupération du code source}
+				Etherscan
+			\subsection{Timed based}
+				covering a time period
+			\subsection{Popularity based}
+		\section{Mesures et résultats}
+			\subsection{Usages}
+				\paragraph{Token}
+	Un token est un actif numérique émis et échangeable sur une blockchain.
+Il possède plusieurs atouts:
+Il peut être transféré sur Internet sans duplication de pair-à-pair, de plus il a les caractéristiques des cryptomonnaies : infalsifiabilité, enregistrement des échanges dans un registre immuable, sécurité des échanges, etc.
+Il est personnalisable. Il peut représenter un droit d?usage d?un produit, un droit de vote, un droit d?auteur, une récompense, un moyen de paiement , une réputation, etc.
+Il peut être vendu et acheté à tout moment, en particulier sur des plateformes d?échange à un prix fixé en temps réel par l?offre et la demande. 
+
+Techniquement, les tokens sont créés et gérés par des smart contracts auxquels qui stockent les soldes des utilisateurs (un mapping entre leurs adresses et la quantité de tokens détenus) ainsi que des fonctions de transfert, dépôt et retrait.
+
+			\subsection{Similarité et réutilisation de code}
+Afin de pouvoir mesurer la proportion de code similaires dans les contrats collectés, une approche similaire aux travaux Norvill de et al. \cite{Norvill} a été utilisée. Plusieurs clusters ont ainsi été créés en utilisant la moyenne des distances mesurées entre les hashes ssdeep des bytecodes de chaque contrat.
+				\subsubsection{Encodage et mesure de distance}
+Les contrats sont représentés par le hash CPTH (Context Triggered Piecewide Hash)\cite{kornblum2006identifying} de leur bytecode en utilisant l'algorithme ssdeep\cite{ssdeep}, qui produit un hash non cryptographique, uniforme et non aléatoire ce qui permet de comparer la similarité des hash pour comparer celle des bytecodes. En effet, il permet de comparer des éléments ayant des séquences d'octets consécutives identiques même si certains octets entre ces séquences ont été insérés, supprimés ou modifiés. Les arguments du constructeur des smart contracts étant ajoutés à la fin, grâce à ce hash, il ne sera donc pas nécessaire de les parser en pré-traitement.
+
+Cette similarité est mesurée à l'aide de la moyenne de la distance entre les distances de Jaccard, Levenshtein et Sorenson, trois distances notamment utilisées pour mesurer la similitude entre textes. L'utilisation de la moyenne permet de réduire l'incertitude, cette méthode a été utilisée dans de précédents travaux de recherche \cite{sung2004static} \cite{namanya2016detection}.
+				\subsubsection{Partitionnement des données}
+L'algorithme de propagation d'affinité \cite{frey2007clustering} a été utilisé pour partitionner les données. L'avantage de cet algorithme est qu'il identifie les éléments exemplaire parmi les données et sélectionne automatiquement le nombre de partitions en fonction des données qui lui sont fournis. 
+
+			\subsection{Sécurité}
+kjj
+%----------------------------------------------------------------------------------------
+%	SECTION 4
+%----------------------------------------------------------------------------------------
+
+	\section{Conclusion}
+Futur possibilité : heuristique voir si contrat malicieux, determiner kel contrat est appelé, si le code source availale, sinon analyse du code source, clash collision, 
+
+\begin{figure}[h]
+\begin{center}
+\caption{Figure caption.}
+\end{center}
+\end{figure}
+
+%----------------------------------------------------------------------------------------
+%	SECTION 5
+%----------------------------------------------------------------------------------------
+\section{Limitations et incertitude}
+
+
+La source d'incertitude la plus évidente:  collecte des données 
+delegatecall dans commentaire
+plusieurs contrat dans un seul source code redondance
+source code correspond pas au bytecode
+juste source code available mais en realité beaucoup plus 
+pas toute la blockchain
+
+
+\section{Travaux connexes}
+
+http://www.ccs.neu.edu/home/amislove/publications/Ethereum-IMC.pdf : In this paper, we examine how contracts in Ethereum are created,
+and how users and contracts interact with one another. We modify
+the geth client to log all such interactions, and find that contracts
+today are three times more likely to be created by other contracts
+than they are by users, and that over 60% of contracts have never
+been interacted with. Additionally, we obtain the bytecode of all
+contracts and look for similarity; we find that less than 10% of usercreated contracts are unique, and less than 1% of contract-created
+contracts are so. Clustering the contracts based on code similarity
+reveals even further similarity. These results indicate that there is
+substantial code re-use in Ethereum, suggesting that bugs in such
+contracts could have wide-spread impact on the Ethereum user
+population
+
+
+
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+\bibliographystyle{abbrv}
+
+\bibliography{biblio}
+
+%----------------------------------------------------------------------------------------
+
+
+\end{document}
