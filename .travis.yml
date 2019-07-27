@@ -1,19 +1,17 @@
 before_install:
-  - docker pull pamplemousse/latex
-
+- docker pull pamplemousse/latex
 deploy:
-  - api_key:
-      secure: yKsknqlG5hfzc4/GMaCoHdcVHTcyNgO/wrx4SttE9zc2OMJHUgv0WqGOzuRn1+67t/GdzZmlgAAmM9+i7c3Vl5XDMyDy3/llURrZh4yqH87Gm3VrI07iYr3HBNwSTQmYaX77SzOAu3Pxtyky2AASAixUu+vhI1z6RcCaNLrtEVPjtb5mBupXI/5wAcL0X2zgb0LO1qW4HgiM0y6AwEL7a24vdFVvuHd8QpYsVCZA4boyLtmvTc1gcyumzjm457XPCccKKg49DAHQqAaVEYjUmlnMMnu1CrH9QdGniQASXvUcBRCB6m0OoVOp47tQansaAmpysrLTa5wBsvfH0ltbc9anVHGuUzwp9zCgh18kuXFc34bu83xMYeLvUIE6zVLS6MdwOLRyqMZNeXIG9kQyme4keptQNdBpQfW68gdt4rsIkbOuYPiGv+1upiIfbMYYBP5SMlwkXRhA0ewsBF39tpaZZ34BLJQxteMsRCCUM7SRHtvZgEFQlteq5wBh49KPM4imNW3fsvXfNcEFbdjf2gxaD2Acg9w7lFDY0sjB74K34tZEwj+gBm7i4iLNV0n9kocxAV0biirnbtMckaqVgivC4kKmR8ft8Dhu9kgM0m63YP3VK+0hVmli/neW/iZIBOAoP3BFUVp9bTkfkKyTE+/dvX8eMCsFeEogWJI1Edc=
-    draft: true
-    file: 'rapport.pdf'
-    provider: releases
-    skip_cleanup: true
-    on:
-      branch: master
-    tags: false
-
+- api_key:
+    secure: HxjB1U/Kfn6wrIhQlUKYLtXeGrHDeoaxR3s5a3Ft4myZIEkfMjM5vhJg3o8fti6xKKFGrSAT6el+8MDo9yySoyinpFnUPFuh1OpyHY4x2zgDhz/H/nE2jZdYScQPfRgYOn2TVg9MRBwGZXsu02uZfgH0TeoH2WtHexHncR5eCv1erB9rqwq6gLb8eEZXZgCjENAS+8PFlz0YGPwk9tzWNo+DiKqJkvNvAVUSpOgp35GgzDvUH1yHnv5GUz8UAlGgBa5mt4HgzRbIHxH2Y/QXcL1JK/rd3FDxyrDzMlZBrpVrGhvUFIt3H6wXy9Uypt7Ok643w6qL0vjO0jU/5kICO80YWX++Km8FK3cM2KLJDElC1b9gUdIqCbUtPJsRwirf383htgYyVLf44hDDycdEgjRxn0FOLMwkv3N0XYDc3jcWRSYlt3JjFEVKRfFydEY77/HACLM4qS/rfrC+Vp5NJ786f/rBa9X95snEF01f2YBSJsN51Gnky6fOoCmCTGudD5YriCuq/6C7NWFO0xDdI8Td+tPwsBZYOKUhhyks2USbP1wCbfqy25LU2qglQBAP5Wz8JrmNyCxT84CFwtl3+5wiepYM8KsunMWCWJfJzi3fw58Srblk1JxHxRItAgrx+vlDBrw2LmPehFiFI1dIR8F2vnJIH0utBUx0pm3mA0=
+  draft: true
+  file: rapport.pdf
+  provider: releases
+  skip_cleanup: true
+  on:
+    branch: master
+  tags: false
 services: docker
-
 script:
-  - cd rapport_fr
-  - docker run --rm -it --user $(id -u):$(id -g) -v $(pwd):/app -w /app pamplemousse/latex latexmk -bibtex -pdf rapport.tex
+- cd rapport_fr
+- docker run --rm -it --user $(id -u):$(id -g) -v $(pwd):/app -w /app pamplemousse/latex
+  latexmk -bibtex -pdf rapport.tex
