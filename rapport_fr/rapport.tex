@@ -217,7 +217,7 @@ Deux des attaques les plus importantes et les plus célèbres sur la blockchain Et
 
  \paragraph{L'attaque DAO} The DAO était un projet ayant pour but de créer un outil de financement à l'aide de smart  contracts. Le projet rencontre rapidement du succès et collecte rapidement près de 150 millions de dollars. En juin 2016, un attaquant a utilisé une vulnérabilité de réentrance afin de dérober l'équivalent de 50 millions de dollars. Comme nous l'avons vu précédemment, l'une des fonctionnalités des contrats intelligents Ethereum est la possibilité d'appeler et d'utiliser le code d'autres contrats externes. L'attaquant a utilisé cette possibilité pour rappeler récursivement la fonction permettant de retirer les fonds, avant que la première exécution ne soit terminée. Cet évènement sera à l'origine de la division de la communauté Ethereum en deux blockchain distinctes: Ethereum et Ethereum Classic.
  
- \paragraph{L'attaque du wallet Parity}Le wallet Parity était un contrat multi-signatures utilisant une bibliothèque externe, un autre contrat dans lequel toutes les fonctions étaient publiques et invocables par n?importe qui, y compris la fonction d?initialisation, que l?attaquant a utilisé afin de changer les propriétaires du contrat. Il a ensuite appelé la fonction "selfdestruct" permettant de désactiver le contrat, . TODO 
+ \paragraph{L'attaque du wallet Parity}Le wallet Parity était un contrat multi-signatures utilisant une bibliothèque externe, un autre contrat dans lequel toutes les fonctions étaient publiques et invocables par n?importe qui, y compris la fonction d?initialisation, que l?attaquant a utilisé afin de changer les propriétaires du contrat. Il a ensuite appelé la fonction "selfdestruct" permettant de désactiver le contrat,  
 
 		
 	\section{Upgradeable smart contracts}
@@ -261,10 +261,11 @@ Les requêtes peuvent être écrites en SQL legacy ou en SQL standard. Cet outils g
 				\paragraph{Token}
 	Un token est un actif numérique émis et échangeable sur une blockchain.
 Il possède plusieurs atouts:
-Il peut être transféré sur Internet sans duplication de pair-à-pair, de plus il a les caractéristiques des cryptomonnaies : infalsifiabilité, enregistrement des échanges dans un registre immuable, sécurité des échanges, etc.
-Il est personnalisable. Il peut représenter un droit d?usage d?un produit, un droit de vote, un droit d?auteur, une récompense, un moyen de paiement , une réputation, etc.
-Il peut être vendu et acheté à tout moment, en particulier sur des plateformes d?échange à un prix fixé en temps réel par l?offre et la demande. 
-
+\begin{itemize}
+\item Il peut être transféré sur Internet sans duplication de pair-à-pair, de plus il a les caractéristiques des cryptomonnaies : infalsifiabilité, enregistrement des échanges dans un registre immuable, sécurité des échanges, etc.
+\item Il est personnalisable. Il peut représenter un droit d?usage d?un produit, un droit de vote, un droit d?auteur, une récompense, un moyen de paiement , une réputation, etc.
+\item Il peut être vendu et acheté à tout moment, en particulier sur des plateformes d?échange à un prix fixé en temps réel par l?offre et la demande. 
+\end{itemize}
 Techniquement, les tokens sont créés et gérés par des smart contracts auxquels qui stockent les soldes des utilisateurs (un mapping entre leurs adresses et la quantité de tokens détenus) ainsi que des fonctions de transfert, dépôt et retrait.
 
 			\subsection{Similarité et réutilisation de code}
