@@ -9,9 +9,7 @@ deploy:
     provider: releases
     skip_cleanup: true
     on:
-    branches:
-      only:
-        -master
+      branch: master
     tags: false
 
 services: docker
