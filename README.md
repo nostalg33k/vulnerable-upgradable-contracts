@@ -1,5 +1,5 @@
 # Upgradeable smart contracts measurements
-<table>
+<table align="center" border="0">
     <tr>
         <td><img src="images/sefcom.png?raw=true" width="256" title="Sefcom"></td>
         <td><img src="images/1280px-Grenoble_INP_-_Esisar_(logo).svg.png?raw=true" width="256" title="Esisar"></td>
@@ -23,11 +23,11 @@ This repo the dataset that was used for the analysis, the python codes for the s
 ## Requirements
 * Python version 3.7 was used.
 
-###_Native_
+### _Native_
 - json
 - re
 
-###_3rd party_
+### _3rd party_
 - beautifulsoup4==4.8.0
 - Distance==0.1.3
 - numpy==1.17.0
