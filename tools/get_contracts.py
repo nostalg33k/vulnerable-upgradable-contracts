@@ -1,17 +1,19 @@
-from google.cloud import bigquery
-from bs4 import BeautifulSoup
-import requests
 import os
-from tqdm import tqdm
 import signal
 import sys
+
+import requests
+from bs4 import BeautifulSoup
+from google.cloud import bigquery
+from tqdm import tqdm
+
 terminate = False
 
 #file to save list of contracts addresses
-CONTRACTS_FILE = '../tesst/test'
+CONTRACTS_FILE = ''
 
 #dir to save Solidity source code
-CONTRACTS_DIR = '../tesst/'
+CONTRACTS_DIR = ''
 
 NB_SOURCE = 0
 NB_DELEGATE = 0
@@ -84,6 +86,22 @@ def get_delegate_code(address):
     else:
         return
 
+    bytecode = str(soup.find(id="verifiedbytecode2")).replace('<div id=\"verifiedbytecode2\">', '').replace('</div>',
+                                                                                                            '')
+
+    # Sometimes no bytecode is returned, even if available
+    while bytecode == "None":
+        try:
+            r = requests.get(url)
+        except requests.exceptions.RequestException as e:
+            print('Error: {}  Contract: {}  Url: {}\n'.format(e, address, url))
+            continue
+        html = r.text
+
+        soup = BeautifulSoup(html, 'html.parser')
+        bytecode = str(soup.find(id="verifiedbytecode2")).replace('<div id=\"verifiedbytecode2\">', '').replace(
+            '</div>', '')
+
     # Fetch contract name if available
     fname = name if len(name) > 0 else address
 
@@ -97,7 +115,7 @@ def get_delegate_code(address):
 
     # Save .sol file
     with open(CONTRACTS_DIR + fname, 'w') as of:
-        of.write('//Contract address: '+ address+'\n'+ code)
+        of.write('//Contract address: ' + address + '\n//Bytecode: ' + bytecode + '\n' + code)
         of.flush()
 
 def sigint_handler(signum, frame):
