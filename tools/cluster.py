@@ -2,6 +2,7 @@ import json
 import re
 
 import distance
+import matplotlib.pyplot as plt
 import numpy as np
 import pydeep
 import tqdm
@@ -54,8 +55,12 @@ def create_contracts(contracts_file):
     print("Contract bytecode hashes computed.")
 
 
-# Compute similarity matrix with mean of 3 distances
 def compute_similarity(X):
+    """
+    Compute similarity matrix with mean of 3 distances
+    :param X: List of contracts ssdeep hashes
+    :return: Similarity matrix
+    """
     jaccard_matrix = pdist(X, lambda x, y: distance.jaccard(x[0], y[0]))
     np.savetxt("../data/jaccard_matrix.csv", np.asarray(squareform(jaccard_matrix)), delimiter=",")
 
@@ -75,7 +80,23 @@ def compute_similarity(X):
 
 
 def clusterize(X):
-    af = AffinityPropagation(affinity="precomputed", max_iter=2000, convergence_iter=200, damping=0.9)
+    """
+
+    :param X: Similarity matrix
+    :return: List of (contract name, contract address, ssdeep hash, cluster label)
+    """
+
+    # choose preference value base on unique contract names
+    names = [re.sub(r"\d+", "", name) for name in contract.name_list]
+    (unique_name, index_name) = np.unique(names, return_index=True)
+    print("Number of unique contract names: ", len(unique_name))
+
+    preference = np.full(len(names), np.amin(similarity_matrix))
+    for index in index_name:
+        preference[index] = np.amax(similarity_matrix)
+
+    af = AffinityPropagation(affinity="precomputed", max_iter=2000, convergence_iter=200, preference=preference,
+                             damping=0.9)
     af.fit(similarity_matrix)
     cluster_centers_indices = af.cluster_centers_indices_
     num_of_clusters = len(cluster_centers_indices)
@@ -83,15 +104,24 @@ def clusterize(X):
 
     print('Number of clusters: %d' % num_of_clusters)
 
-    # output file as csv: contract name - contract address - ssdeep hash - cluster
     output = []
     for i in range(len(labels)):
         c = [contract.name_list[i], contract.address_list[i], contract.hash_list[i], labels[i]]
         output.append(c)
 
-    np.savetxt("../data/contracts_clustering.csv", output, delimiter="],", fmt='%s')
-    return output, cluster_centers_indices, labels
+    np.savetxt("../data/contracts_clustering.csv", output, delimiter=",", fmt='%s')
+    return output
 
+
+def autolabel(rects):
+    """Attach a text label above each bar in *rects*, displaying its height."""
+    for rect in rects:
+        height = rect.get_height()
+        ax.annotate('{}'.format(height),
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 3),  # 3 points vertical offset
+                    textcoords="offset points",
+                    ha='center', va='bottom')
 
 if __name__ == '__main__':
     create_contracts('../data/contracts_list')
@@ -100,4 +130,22 @@ if __name__ == '__main__':
 
     similarity_matrix = compute_similarity(X)
 
-    output, indices, labels = clusterize(similarity_matrix)
+    output = clusterize(similarity_matrix)
+
+    # Plot cluster size/examplar name
+    nb_clusters = 10
+    (cluster, index, freq) = np.unique([i[3] for i in output], return_index=True, return_counts=True)
+    name = [re.sub(r"\d+", "", output[i][0]) for i in index]
+    address = [output[i][1] for i in index]
+    sort = sorted([(address[i], name[i], freq[i]) for i in range(len(name))], key=lambda c: c[2],
+                  reverse=True)
+
+    fig, ax = plt.subplots()
+    bars = ax.bar(range(nb_clusters), [v[2] for v in sort[:nb_clusters]], label=[v[1] for v in sort[:nb_clusters]])
+    autolabel(bars)
+    plt.ylabel("Cluster size")
+    plt.xlabel("Exemplar name")
+
+    xticks_pos = [0.65 * rect.get_width() + rect.get_xy()[0] for rect in bars]
+    plt.xticks(xticks_pos, labels=[v[1] for v in sort[:nb_clusters]], ha='right', rotation=45)
+    plt.show()
