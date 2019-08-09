@@ -80,10 +80,6 @@
 \maketitle % Insert the title, author and date
 
 
-%----------------------------------------------------------------------------------------
-%	SECTION 1
-%----------------------------------------------------------------------------------------
-
 \section{Résumé}
 
 Ethereum est actuellement la blockchain la plus populaire auprès des entreprises et des gouvernements. Parmi le top 50 des entreprises valorisées à plus d'1 milliards de dollars, 24 développent actuellement sur la blockchain Ethereum, tandis que 12 utilisent des plateformes dérivées.\cite{ref1} Ethereum est un écosystème utilisant la technologie blockchain qui fournit non seulement une plateforme pour les transactions de cryptomonnaies mais également pour le développement de \enquote*{smart contracts} ou \enquote*{contrats intelligents}, qui sont des programmes pouvant être stockés, appelés et exécutés sur la blockchain. Ces programmes sont immuables, ce qui signifie que ni l'adresse ni le code d'un contrat déployé ne peuvent être modifiés. Cependant, ces contrats intelligents peuvent également appeler et envoyer Ether à d'autres contrats, plusieurs approches et modèles peuvent alors être utilisés pour créer des \enquote*{contrats intelligents évolutifs} pouvant compromettre les principes d'immuabilité et de \enquote*{trustlessness} de la blockchain. Compte tenu de leur capacité à manipuler et à contenir des cryptomonnaies, les contrats évolutifs doivent être utilisés avec prudence car ils peuvent notamment donner la possibilité au propriétaire de le mettre à niveau vers une version malveillante afin de voler ou de geler des fonds.
@@ -94,12 +90,16 @@ Dans ce rapport, nous aborderons les techniques utilisées afin de créer des cont
   Ethereum is currently the most popular blockchain for companies and government to experiment with, as 24 of the top 50 billion-dollar organizations are currently experimenting with Ethereum public blockchains while 12 are using Ethereum-derived blockchains platforms.\cite{ref1} Ethereum is a blockchain ecosystem that provides both a public ledger for cryptocurrencies transactions as well as smart contracts, programs that can be stored, called and executed on the blockchain. Contracts are immutable, meaning the address and code of a deployed contract cannot be changed. Although, because smart contracts can interact with other contracts, several approaches and patterns can be used to create  \enquote{upgradeable smart contracts} , compromising the blockchain immutability and trustlessness. Given their ability to manipulate and hold funds, upgradeable contracts should be used only when necessary as it gives the owner of the contract the ability to upgrade it to a malicious version in order to steal or freeze funds.
 In this paper, we address this problem and quantify the proportion of upgradeable contracts with available source code using the Proxy pattern with a dataset from Ethereum blockchain.
 
- \tableofcontents
+%----------------------------------------------------------------------------------------
+%	CHAP 1 SECTION 1
+%----------------------------------------------------------------------------------------
+
+\tableofcontents
 	\chapter{Introduction}
 		\section{Contexte et objectifs}
 			\subsection{Présentation du laboratoire SEFCOM}
 
-Jéai effectué mon stage en tant qu'assistante de recherche au sein du laboratoire SEFCOM (Laboratory of Security Engineering for Future Computing) à ASU (Arizona State University).
+J'ai effectué mon stage en tant qu'assistante de recherche au sein du laboratoire SEFCOM (Laboratory of Security Engineering for Future Computing) à ASU (Arizona State University).
 \par
 ASU est une des plus importantes universités publiques des États-Unis avec 5 campus et plus de 80000 étudiants inscrits en 2018. Elle fait partie des meilleures universités de recherche avec un budget estimé à 604 millions de dollars pour l'année 2018 et a été classée au premier rang des écoles les plus innovantes des États-Unis en 2019 pour la quatrième année consécutive.
 \par
@@ -199,9 +199,14 @@ La blockchain est une technologie attisant aussi bien l'intérêt des chercheurs q
 Les géants du web ne sont pas en reste puisque Facebook prévoit notamment de lancer sa propre cryptomonnaie Libra en 2020\cite{libra}.
 Au niveau du marché du travail, la demande progresse et les profils spécialisés sont de plus en plus recherchés et sollicités.
 En attendant sa démocratisation, c'est aux chercheurs qu'incombent la tâche de résoudre les enjeux liés à cette technologie, notamment en terme de scalabilité et de sécurité.
-
+%----------------------------------------------------------------------------------------
+%	CHAP 2
+%----------------------------------------------------------------------------------------
 	\chapter{La blockchain Ethereum et les smart contracts}
 Cette section présente le fonctionnement de la blockchain Ethereum, de l'EVM (Ethereum Virtual Machine) et des smart contracts. Pour une présentation générale de la blockchain, se référer à l'Annexe A.
+%----------------------------------------------------------------------------------------
+%	SECTION 2.1
+%----------------------------------------------------------------------------------------
 \section{L'écosystème Ethereum}
 Lancé en décembre 2013 par Vitalik Buterin sous la forme d'un livre blanc puis formalisé par Gavin Wood en 2014 dans le \enquote{Yellow Paper}  \cite{wood2014ethereum},  Ethereum est actuellement le deuxième plus grand écosystème blockchain derrière Bitcoin avec une capitalisation boursière supérieure à 22 milliards de dollars en juillet 2019 \cite{cap}. Tout comme Bitcoin, il s'appuie également sur une blockchain publique et sa principale cryptomonnaie est l'Ether (ETH) mais de nombreuses autres cryptomonnaies ou tokens (cf. section 3.3.1) sont également échangés sur la plateforme.
 La particularité de la blockchain Ethereum est qu'elle permet non seulement aux utilisateurs d'interagir entre eux et de stocker leurs transactions mais également de créer et d'interagir avec des programmes appelés \enquote{smart contract} .
@@ -266,7 +271,7 @@ Actuellement, le set d'instructions est composé de 150 opcodes auxquels sont ass
 C'est une machine à pile qui dispose d'éléments volatiles ainsi que d'éléments persistants:
 \begin{description}
     \item[stack] La pile est un élément volatile pouvant contenir 1024 valeurs de 32 octets. Toutes les opérations sont ainsi réalisées via la pile (sauf appel de fonctions d'autres contrats).
-    \item[memory] La mémoire est un élément volatile qui est utilisé pour les appels de fonctions extérieures. Elle permet de stocker les paramétres, les variables locales et ses valeurs de retour des fonctions appelées. Chaque adresse correspond à 1 octet mais il est possible d'y stocker 1 ou 32 octets à la fois via les instructions MSTORE8 et MSTORE respectivement. La lecture se fait avec l'instruction MLOAD qui permet de lire 32 octets.
+    \item[memory] La mémoire est un élément volatile qui est utilisé pour les appels de fonctions extérieures. Elle permet de stocker les paramêtres, les variables locales et ses valeurs de retour des fonctions appelées. Chaque adresse correspond à 1 octet mais il est possible d'y stocker 1 ou 32 octets à la fois via les instructions MSTORE8 et MSTORE respectivement. La lecture se fait avec l'instruction MLOAD qui permet de lire 32 octets.
     \item[storage] L'espace de stockage du contrat exécuté est un élément persistent. Les opcodes permettant de lire et d'écrire dans le storage sont SLOAD et SSTORE, y stocker des éléments est extremment couteux, le prix de SSTORE étant de 20000 gas. Voir la section TODO pour plus de détail sur son fonctionnement.
     \item[code] Le code du contrat exécuté est un élément persistent.
 \end{description}
@@ -308,8 +313,11 @@ On peut ainsi définir la fonction $\varphi $, qui à partir de l'état actuel du s
 \end{itemize}
 Un arrêt exceptionnel donne lieu à l'annulation de tous les changements effectués, à la restauration de l'état précédent et au remboursement du montant de gas non utilisé.
 
+%----------------------------------------------------------------------------------------
+%	SECTION 2.2
+%----------------------------------------------------------------------------------------
 	\section{Sécurité et vulnérabilités}
-Bien que sécurisée par des algorithmes cryptographiques et consensuels, la blockchain n'est pas sans faille. Parce que les smart contract sont écrits par des humains et qu'ils ne peuvent étre modifiés une fois déployé dans la blockchain, la sécurité joue un réle majeur dans le développement de telles applications. Plusieurs vulnérabilités ont été découvertes et exploitées ces derniéres années.
+Bien que sécurisée par des algorithmes cryptographiques et consensuels, la blockchain n'est pas sans faille. Parce que les smart contract sont écrits par des humains et qu'ils ne peuvent être modifiés une fois déployé dans la blockchain, la sécurité joue un réle majeur dans le développement de telles applications. Plusieurs vulnérabilités ont été découvertes et exploitées ces derniéres années.
 
 La taxonomie ci-dessous est fréquemment citée et regroupe les vulnérabilités en fonction du niveau architectural oé la vulnérabilité se produit: dans le langage de programmation, le bytecode EVM ou en raison de caractéristiques générales de la blockchain.
 
@@ -330,8 +338,11 @@ Deux des attaques les plus importantes et plus célébres sur la blockchain Ethere
 
  \paragraph{L'attaque du wallet Parity}Le wallet Parity était un contrat multi-signatures utilisant une bibliothéque externe, un autre contrat dans lequel toutes les fonctions étaient publiques et invocables par n'importe qui, y compris la fonction d'initialisation, que l'attaquant a utilisé afin de changer les propriétaires du contrat. Il a ensuite appelé la fonction "selfdestruct" permettant de désactiver le contrat, gelant l'équivalent de 150 millions de dollars.
 
-Il n'est cependant pas suffisant de se protéger contre les attaques connus et c'est pour cette raison que de nombreux développeurs adoptent une approche plus proche du développement classique pour créer des contrats pouvant étre mis à jour en cas de bug ou afin d'ajouter de nouvelles fonctionnalités.
+Il n'est cependant pas suffisant de se protéger contre les attaques connus et c'est pour cette raison que de nombreux développeurs adoptent une approche plus proche du développement classique pour créer des contrats pouvant être mis à jour en cas de bug ou afin d'ajouter de nouvelles fonctionnalités.
 
+%----------------------------------------------------------------------------------------
+%	SECTION 2.3
+%----------------------------------------------------------------------------------------
 	\section{Upgradeable smart contracts}
 Les différentes méthodes de création d'un contrat évolutif et leurs vulnérabilités ont fait l'objet d'un article sur le blog de Trails of Bits. \cite{ref2} Cette section s'attardera plus particuliérement sur le pattern Proxy puisque c'est sur celui-ci que portent les mesures présentées dans la section 3.
 
@@ -343,7 +354,7 @@ Le contrat A est le contrat "proxy" et pointe ainsi vers l'adresse du contrat B,
 \begin{figure}
 \centering
   \includegraphics[scale=0.6]{figures/proxy.png}
-  \caption{Structure de l'espace de stockage du contrat ExempleStockage}
+  \caption{Schéma du pattern "Proxy"}
 \end{figure}
 
 Pour mettre à jour le contrat B, il suffit de déployer un nouveau contrat B' et de mettre à jour la référence vers cette nouvelle adresse dans le contrat A.
@@ -427,13 +438,13 @@ Cette fonction récupére l'adresse de l'implémentation et s'assure que celle-ci e
 \end{lstlisting}
 
 Avant la version 0.5.0 de Solidity, la fonction delegatecall ne permettait pas d'accéder aux valeurs de retour. Il était donc nécessaire d'utiliser de l'assembleur en ligne (" inline assembly ") dans le code source, qui permet d'avoir un contréle plus fin et plus bas niveau sur les opérations effectuées.
-Le contenu de la transaction doit étre récupéré pour étre transmis via le delegatecall. La variable ptr est initialisée avec la valeur contenue à la position 0x40 dans la mémoire, il s'agit de la valeur du prochain emplacement de mémoire disponible. La ligne suivante utilise l'instruction calldatacopy pour copier le contenu de la transaction de taille calldatasize, à partir de la position 0 à l'emplacement ptr.
+Le contenu de la transaction doit être récupéré pour être transmis via le delegatecall. La variable ptr est initialisée avec la valeur contenue à la position 0x40 dans la mémoire, il s'agit de la valeur du prochain emplacement de mémoire disponible. La ligne suivante utilise l'instruction calldatacopy pour copier le contenu de la transaction de taille calldatasize, à partir de la position 0 à l'emplacement ptr.
 \begin{lstlisting}[language=Solidity,numbers=none]
 let ptr := mload(0x40)
       calldatacopy(ptr, 0, calldatasize)
 \end{lstlisting}
 
-L'instruction delegatecall est ensuite exécutée pour envoyer un message vers l'adresse \_impl, contenant un montant gas pour exécuter la fonction appelée. Le paramétre ptr précise l'emplacement mémoire oé les données sont contenues, calldatasize  la taille de ces données. Les deux paramétres suivants mis à 0 correspondent à la variable à laquelle assigner les données de retour et à la taille de ces données, ils sont inutilisés car on ne connait pas le résultat du retour avant l'appel.
+L'instruction delegatecall est ensuite exécutée pour envoyer un message vers l'adresse \_impl, contenant un montant gas pour exécuter la fonction appelée. Le paramêtre ptr précise l'emplacement mémoire oé les données sont contenues, calldatasize  la taille de ces données. Les deux paramêtres suivants mis à 0 correspondent à la variable à laquelle assigner les données de retour et à la taille de ces données, ils sont inutilisés car on ne connait pas le résultat du retour avant l'appel.
    \begin{lstlisting}[language=Solidity,numbers=none]
       let result := delegatecall(gas, _impl, ptr, calldatasize, 0, 0)
 \end{lstlisting}
@@ -453,7 +464,7 @@ Si l'exécution s'est bien déroulée (i.e la variable result n'est pas égal à 0) l
 
 
 			\subsubsection{Vulnérabilités et inconvénients}
-Les smart contracts n'ont pas été pensés pour étre mis à jour, il y a donc un compromis à faire entre cette possibilité et leur sécurité. De plus, avec cette approche, les développeurs doivent garder en téte que le contrat Proxy n'est lui pas modifiable et que les coéts d'appel à ce type de contrat sont plus élevés puisque le delegatecall consomme davantage de gas pour appeler le contrat d'implémentation.
+Les smart contracts n'ont pas été pensés pour être mis à jour, il y a donc un compromis à faire entre cette possibilité et leur sécurité. De plus, avec cette approche, les développeurs doivent garder en tête que le contrat Proxy n'est lui pas modifiable et que les coéts d'appel à ce type de contrat sont plus élevés puisque le delegatecall consomme davantage de gas pour appeler le contrat d'implémentation.
 
 				\paragraph{Gestion de l'espace de stockage}
 
@@ -481,7 +492,7 @@ Le mécanisme est cependant différent pour l'allocation dynamique:
      \caption{Structure de l'espace de stockage du contrat ExempleStockage}
  \end{figure}
 
- Remarque: Un emplacement peut étre occupé par plusieurs variables si celles ci sont d'une taille inférieure à 256 bits.
+ Remarque: Un emplacement peut être occupé par plusieurs variables si celles ci sont d'une taille inférieure à 256 bits.
 
 
 \large{\textit{`` If state variables are accessed via a low-level delegatecall, the storage layout of the two contracts must align in order for the called contract to correctly access the storage variables of the calling contract by name.
@@ -509,26 +520,26 @@ Emplacement & Proxy & Implementation \\
 
 Imaginons que le contrat d'implémentation contienne la fonction setFoo(uint256 i) permettant de changer la valeur de foo. En appellant delegatecall(setfoo(5)), la valeur 5 sera assignée à la variable à l'emplacement 0 dans le contexte du contrat Proxy, c'est à  dire à  la variable implementation.
 
-De même, des collisions entre différentes versions du contrat d'implémentation peuvent se produire comme dans la figure ci-dessous.
+De même, des collisions entre différentes versions du contrat d'implémentation peuvent se produire.
 
-%\noindent\begin{tabular}{|c|c|c|}
-%\hline
-%Emplacement & Implementation V1 & Implementation V2 \\
-%\hline
-%0 & address implementation & address previous_implementation \\
-%\hline
-%1 & address owner & address implementation \\
-%\hline
-%2 & mapping (address => uint256) balance & address owner \\
-%\hline
-%4 & ... & mapping (address => uint256) balance \\
-%\hline
-%\end{tabular}
+\noindent\begin{tabular}{|c|c|c|}
+\hline
+Emplacement & Implementation V1 & Implementation V2 \\
+\hline
+0 & address implementation & address previous\_implementation \\
+\hline
+1 & address owner & address implementation \\
+\hline
+2 & mapping (address => uint256) balance & address owner \\
+\hline
+4 & ... & mapping (address => uint256) balance \\
+\hline
+\end{tabular}
 
 Si la nouvelle version du contrat hérite de l'ancienne mais ajoute une variable au mauvais emplacement, toutes les variables seront corrompues.
 
 				\paragraph{Function selector collision}
-Le "function selector" correspond aux quatres premiers octets du hash de la signature de la fonction. La signature est définie comme le prototype de la fonction, i.e son nom suivie de la liste des types de paramétres entre parenthéses, séparés par une seule virgule sans espace \cite{functionselector}. La fonction de fallback n'a pas de "function selector".
+Le "function selector" correspond aux quatres premiers octets du hash de la signature de la fonction. La signature est définie comme le prototype de la fonction, i.e son nom suivie de la liste des types de paramêtres entre parenthéses, séparés par une seule virgule sans espace \cite{functionselector}. La fonction de fallback n'a pas de "function selector".
 Celui-ci permet, lors d'un appel, de sélectionner la fonction à appeler mais puisqu'il comporte un nombre d'octets fixe, une collision avec d'autres fonctions peut toujours avoir lieu. Le compilateur de Solidity détecte les collisions ayant lieu dans le méme contrat, cependant, dans le cas d'un appel vers un autre contrat, la collision passera inaperéue.
 
 Dans le cas d'un contrat utilisant le pattern "Proxy", il est ainsi possible d'insérer un comportement malicieux dans une fonction A() du contrat proxy, qui correspond au méme "function selector" qu'une fonction B dans le contrat d'implémentation. L'utilisateur croira appeller la fonction B mais l'appel ne sera pas transmis et c'est la fonction A qui sera directement appelée.
@@ -568,7 +579,7 @@ stringStorage[hash] = v;
    \begin{lstlisting}[language=Solidity,numbers=none]
 bytes32 private constant implementationPosition = bytes32(uint256(keccak256('proxy.implementation')));
  \end{lstlisting}
-Contrairement aux autres approches, le contrat d'implémentation n'a donc pas besoin d'hériter de la structure de l'espace de stockage du proxy, celui comportant 2\^{256} emplacements possibles, il est trés peu probable d'avoir une collision. De plus, le mot clé  \emph{constant} indique que la variable n'occupera aucun emplacement dans l'espace de stockage mais que sa valeur lui sera affecté lors de la compilation. Ainsi, puisqu'elle fait partie du bytecode du contrat, elle ne pourra étre écrasée.
+Contrairement aux autres approches, le contrat d'implémentation n'a donc pas besoin d'hériter de la structure de l'espace de stockage du proxy, celui comportant 2\^{256} emplacements possibles, il est trés peu probable d'avoir une collision. De plus, le mot clé  \emph{constant} indique que la variable n'occupera aucun emplacement dans l'espace de stockage mais que sa valeur lui sera affecté lors de la compilation. Ainsi, puisqu'elle fait partie du bytecode du contrat, elle ne pourra être écrasée.
 
 
 \end{description}
@@ -584,13 +595,13 @@ Le détenteur du contrat ne pourra cependant pas utiliser les fonctions du contra
 
 
 				\paragraph{Disponibilité du code source}
-Dans tous les cas, qu'il puisse étre mis à jour ou non, un utilisateur devrait toujours s'assurer que le contrat avec lequel il souhaite interagir a le comportement désiré. Une maniére de s'en assurer est de se procurer le code source, de le compiler et de comparer le résultat avec le bytecode du contrat. Si ceux-ci sont identiques, on a alors la certitude que le code source fourni correspond à ce contrat. Lorsque le code source n'est pas fourni, à moins de décompiler le bytecode, le comportement du contrat nous est inconnu.
+Dans tous les cas, qu'il puisse être mis à jour ou non, un utilisateur devrait toujours s'assurer que le contrat avec lequel il souhaite interagir a le comportement désiré. Une maniére de s'en assurer est de se procurer le code source, de le compiler et de comparer le résultat avec le bytecode du contrat. Si ceux-ci sont identiques, on a alors la certitude que le code source fourni correspond à ce contrat. Lorsque le code source n'est pas fourni, à moins de décompiler le bytecode, le comportement du contrat nous est inconnu.
 
 
  				\paragraph{Procédure de mise à jour}
-Lorsque l'utilisateur interagit avec un contrat pouvant étre mis à jour, il fait alors confiance au détenteur du contrat de ne pas mettre à jour vers une version malicieuse exploitant les vulnérabilités mentionnées ou changeant ses fonctionnalités. Plusieurs techniques peuvent étre mis en place pour garantir la transparence du processus de mise à jour.
+Lorsque l'utilisateur interagit avec un contrat pouvant être mis à jour, il fait alors confiance au détenteur du contrat de ne pas mettre à jour vers une version malicieuse exploitant les vulnérabilités mentionnées ou changeant ses fonctionnalités. Plusieurs techniques peuvent être mis en place pour garantir la transparence du processus de mise à jour.
  \begin{description}
-     \item[Evénement] Un événement ("event") est un signal pouvant étre émis par un smart contrat, à la maniére d'une notification. Les applications et utilisateurs utilisant la blockchain peuvent étre notifiés de ces événements et accéder à l'historique en regardant les entrées de log de la blockchain. On peut ainsi définir un événement pour notifier les utilisateurs de la mise à jour du contrat de la maniére suivante:
+     \item[Evénement] Un événement ("event") est un signal pouvant être émis par un smart contrat, à la maniére d'une notification. Les applications et utilisateurs utilisant la blockchain peuvent être notifiés de ces événements et accéder à l'historique en regardant les entrées de log de la blockchain. On peut ainsi définir un événement pour notifier les utilisateurs de la mise à jour du contrat de la maniére suivante:
  \begin{lstlisting}[language=Solidity,numbers=none]
 event Upgraded(address nextVersion);
  \end{lstlisting}
@@ -603,14 +614,14 @@ function upgradeTo(address _implementation) onlyOwner {
      }
  \end{lstlisting}
 
-  \item[Contrat multi-signature] Il est possible de faire en sorte que le détenteur du contrat "Proxy" soit un contrat multi-signature. Chaque transaction requiert alors la signature de plusieurs personnes (toutes, M of N, etc..) pour étre effective. Méme si le risque est mitigé, l'utilisation du contrat nécessite toujours un certain facteur de confiance.
-    \item[Vote] Les mises à jour peuvent étre soumises au vote des utilisateurs: le développeur doit avoir déployé la nouvelle version du contrat au préalable puis fournir l'adresse et le code source ainsi que la date de la mise à jour. Si les votes favorables dépassent un certain pourcentage fixée à l'avance, la mise à jour a lieu a la date fixée et durant une certaine période les utilisateurs non favorables à la mise à jour auront le choix de stopper leur utilisation du contrat, retirer leurs fonds, etc..
-      \item[Mise à jour programmée]  Avec les mémes pré-conditions que le vote, les utilisateurs pourront ainsi vérifier la correspondance du code source avec le bytecode du nouveau contrat, vérifier ses nouvelles fonctionnalités et potentielles vulnérabilités durant la période de préavis.Un des inconvénients est que si une vulnérabilité est découverte aprés la mise à jour, elle ne pourra étre corrigée immédiatement, une procédure d'arrét d'urgence peut étre mise en place pour contrer ce probléme.
+  \item[Contrat multi-signature] Il est possible de faire en sorte que le détenteur du contrat "Proxy" soit un contrat multi-signature. Chaque transaction requiert alors la signature de plusieurs personnes (toutes, M of N, etc..) pour être effective. Méme si le risque est mitigé, l'utilisation du contrat nécessite toujours un certain facteur de confiance.
+    \item[Vote] Les mises à jour peuvent être soumises au vote des utilisateurs: le développeur doit avoir déployé la nouvelle version du contrat au préalable puis fournir l'adresse et le code source ainsi que la date de la mise à jour. Si les votes favorables dépassent un certain pourcentage fixée à l'avance, la mise à jour a lieu a la date fixée et durant une certaine période les utilisateurs non favorables à la mise à jour auront le choix de stopper leur utilisation du contrat, retirer leurs fonds, etc..
+      \item[Mise à jour programmée]  Avec les mémes pré-conditions que le vote, les utilisateurs pourront ainsi vérifier la correspondance du code source avec le bytecode du nouveau contrat, vérifier ses nouvelles fonctionnalités et potentielles vulnérabilités durant la période de préavis.Un des inconvénients est que si une vulnérabilité est découverte aprés la mise à jour, elle ne pourra être corrigée immédiatement, une procédure d'arrét d'urgence peut être mise en place pour contrer ce probléme.
   \end{description}
 
 
    				\paragraph{Arrét d'urgence}
-L'arrét d'urgence permet de désactiver certaines fonctionnalités du contrat dans le cas ou une vulnérabilité est découverte, ou en cas de mise à jour pour éviter la corruption des données due à l'utilisation de l'ancien contrat. L'arrét d'urgence peut-étre déclenché par un ou des utilisateurs ou automatiquement suivant certaines conditions (aprés un certain temps par exemple). On peut l'implémenter gréce à une variable d'état et un modifier:
+L'arrét d'urgence permet de désactiver certaines fonctionnalités du contrat dans le cas ou une vulnérabilité est découverte, ou en cas de mise à jour pour éviter la corruption des données due à l'utilisation de l'ancien contrat. L'arrét d'urgence peut-être déclenché par un ou des utilisateurs ou automatiquement suivant certaines conditions (aprés un certain temps par exemple). On peut l'implémenter gréce à une variable d'état et un modifier:
  \begin{lstlisting}[language=Solidity,numbers=none]
 
  pragma solidity ^0.4.24;
@@ -653,54 +664,103 @@ function unstopContract() public onlyOwner contractStopped {
 
 	\chapter{Méthodologie}
 Dans cette section est décrite la méthodologie utilisée, en commenéant par le choix du jeu de données puis la présentation des outils et méthodes utilisés pour le filtrage de ce dernier, les mesures effectuées et les résultats obtenus.
-		\section{Jeu de données}
+%----------------------------------------------------------------------------------------
+%	SECTION 2.4
+%----------------------------------------------------------------------------------------
+\section{Construction des datasets}
 
-				\paragraph{Utilisation de Google BigQuery}
+3 jeux de données de contrats utilisant le pattern proxy ont été créés pour les mesures et l'analyse:
+begin{\begin{description}
+    \item[Jeu de données 1] Un sous-ensemble de 2462 contrats créés en 2018.
+    \item[Jeu de données 2]  Un sous-ensemble de 990 contrats créés en 2019 entre le 01/01/2019 and 31/05/2019.
+    \item[Jeu de données 3]  Un sous-ensemble de 20+ contrats parmi les plus populaires basés sur le nombre de transactions reçus.
+\end{description}}
+
+Les datasets sous forme de fichiers JSON, ainsi que toutes les données et les codes servant aux mesures et à l'analyse sont disponibles sur mon Github.
+Les codes, faisant l'objet d'une explication ci-dessous, sont également disponibles en Annexe TODO. 
+
+				\subsection{Récupération des données via Google BigQuery}
 
 BigQuery est un SaaS web RESTful qui permet l'analyse de grands ensembles de données.
 Des requêtes SQL ainsi que la librairie Python BigQuery peuvent être utilisées pour interroger les jeux de données construits, ils peuvent également être téléchargés au format JSON ou CSV.
 
-Les données de la blockchain Ethereum tels que les blocs, les logs, les contrats, les transactions etc.. se trouvent dans le jeu de données ethereum\_blockchain \cite{ethereum_bigquery}, mis à jour quotidiennement. Les données ont été extraites de la blockchain grâce à l'outil Ethereum ETL.
+Les données de la blockchain Ethereum tels que les blocs, les logs, les contrats, les transactions, se trouvent dans le jeu de données ethereum\_blockchain \cite{ethereum_bigquery}, mis à jour quotidiennement. Les données ont été extraites de la blockchain grâce à l'outil Ethereum ETL.
 
-La table contract a été utilisée pour récolter notre jeu de données. Il s'agit d'un sous-ensemble des contrats contenus dans la blockchain Ethereum, créé en Août 2018. La table contient actuellement 17,392,063 contrats et fait une taille de 18GB.
+La table contract a été utilisée pour récolter nos jeux de données. Il s'agit d'un sous-ensemble des contrats contenus dans la blockchain Ethereum, créé en Août 2018. La table contient actuellement 17,392,063 contrats et fait une taille de 18GB.
 
-Un sous-ensemble de cette table a été téléchargée et filtrée afin de créer 3 jeux de données de contrats utilisant le pattern proxy:
-begin{\begin{itemize}
-    \item Un sous-ensemble de 2462 contrats créés en 2018.
-    \item Un sous-ensemble de 990 contrats créés en 2019 entre le 01/01/2019 and 31/05/2019.
-    \item Un sous-ensemble de 20+ contrats parmi les plus populaires basés sur le nombre de transactions reçus.
-\end{itemize}}
+Dans le fichier get\_contracts.py, on retrouve la fonction get\_contracts\_from\_bigQuery() qui utilise la librairie python et l'API pour s'authentifier au service et effectuer des requêtes. En particulier la requête ci-dessous, utilisée pour récupérer les adresses de l'ensemble des contrats créés entre le 01/01/2019 to 31/05/2019 pour construire le dataset 1.
 
-		\section{Collecte des contrats utilisant le pattern Proxy}
-Afin de savoir si un contrat utilise le pattern Proxy, il est nécessaire d'accéder à son code source.
-			\subsection{Récupération du code source}
-                \paragraph{Etherscan}
-Etherscan un moteur de recherche qui index les transactions sur la blockchain Ethereum. Le site web met également à disposition un système de vérification de smart contracts, qui permet au créateur de poster publiquement le code source qui est ensuite comparer au bytecode disponible sur la blockchain pour s'assurer de leur correspondance.
+ \begin{lstlisting}[language=SQL,numbers=none]
+SELECT address  FROM `bigquery-public-data.crypto_ethereum.contracts` 
+WHERE block_timestamp >= "2019-01-01 00:00:00" 
+AND block_timestamp < "2019-05-31 00:00:00" 
+AND bytecode != "0x" 
+ORDER BY block_timestamp
+ \end{lstlisting}
+
+De même on peut récupérer les 10000 premiers contrats les plus populaires en terme de transactions reçues pour le dataset 3 en effectuant la requête ci-dessous:
+ \begin{lstlisting}[language=SQL,numbers=none]
+  \end{lstlisting}
+
+				\subsection{Récupération du code source et du bytecode}
+Une première selection s'effectue au niveau de la récupération du code source. A ce stade, la sélection limitée aux contrats dont le code source est disponible et contenant au moins une occurence du terme "delegatecall". 
+
+               				\paragraph{Etherscan}
+Etherscan est un moteur de recherche qui index les transactions sur la blockchain Ethereum. Le site web met également à disposition un système de vérification de smart contracts, qui permet au créateur de poster publiquement le code source qui est ensuite comparer au bytecode disponible sur la blockchain pour s'assurer de leur correspondance.
+Les contrats peuvent avoir les annotations suivantes: 
+\begin{description}
+\item[Correspondance exacte] Le code source fournit est vérifié avec les arguments du constructeur exacts. 
+\item[Correspondance similaire] Le bytecode du contrat correspond au bytecode d'un autre contrat vérifié avec une correspondance exacte. Les arguments du constructeurs sont cependant différents. 
+\end{description}
 
 
-TODO SCRIPT PYTHON
+Dans le fichier get\_contracts.py, la fonction get\_delegate\_code(address) implémente un scraper utilisant la bibliothèque BeautifulSoup pour extraire les données sur le smart contract à partir de sa page HTML sur le site Etherscan. 
+
+A partir de l'uri, on récupère le document HTML grâce au module requests de python. 
+ \begin{lstlisting}[language=Python,numbers=none]
+url = "https://etherscan.io/address/%s#code" % address
+
+    try:
+        r = requests.get(url)
+    except requests.exceptions.RequestException as e:
+        print('Error: {}  Contract: {}  Url: {}\n'.format(e, address, url))
+        return
+
+    html = r.text
+     \end{lstlisting}
+On analyse ensuite le document avec l'analyseur html.parser. 
+ \begin{lstlisting}[language=Python,numbers=none]
+soup = BeautifulSoup(html, 'html.parser')
+     \end{lstlisting}
+     
+On peut alors naviguer dans l'arborescence DOM en spécifiant des noms de balises tel que id ou class pour récupérer le nom, le bytecode et le code source du contrat. 
+Si ce dernier contient le mot clé "delegatecall", on sauvegarde son code source pour l'inspection manuelle.
+
+				\subsection{Inspection manuelle}
+L'analyse de ces contrats nécessite une inspection manuelle pour vérifier que la fonction delegatecall est bien utilisée dans le cadre d'un contrat Proxy permettant à l'implémentation d'être mise à jour. 
+Au delà de la présence de l'instruction delegatecall, les contrats ont également été inspectés pour confirmer la présence d'une fonction permettant la mise à jour. Afin d'augmenter l'efficience de la démarche,  des contrats "types" ont été identifiés par leur nom et/ou code source, les contrats similaires ont ainsi été triés automatiquement.
+
+TODO prototype des fonctions de mise à jour?
+Cette dernière étape a engendré les datasets présentés en début de chapitre.
+
+
 
 		\section{Mesures et résultats}
-			\subsection{Usages}
-				\paragraph{Token}
-	Un token est un actif numérique émis et échangeable sur une blockchain.
-Il posséde plusieurs atouts:
-\begin{itemize}
-\item Il peut étre transféré sur Internet sans duplication de pair-é-pair, de plus il a les caractéristiques des cryptomonnaies : infalsifiabilité, enregistrement des échanges dans un registre immuable, sécurité des échanges, etc.
-\item Il est personnalisable. Il peut représenter un droit d'usage d'un produit, un droit de vote, un droit d'auteur, une récompense, un moyen de paiement , une réputation, etc.
-\item Il peut étre vendu et acheté à tout moment, en particulier sur des plateformes d'échange à un prix fixé en temps réel par l'offre et la demande.
-\end{itemize}
-Techniquement, les tokens sont créés et gérés par des smart contracts auxquels qui stockent les soldes des utilisateurs (un mapping entre leurs adresses et la quantité de tokens détenus) ainsi que des fonctions de transfert, dépét et retrait.
+Beaucoup de contrats sur la blockchain sont en réalité dormants et très peu utilisés. En effet, sur l'ensemble des contrats présents dans le jeu de données BigQuery ethereum\_blockchain, le contrat au rang TODO  en terme de transactions reçus a fait l'objet de TODO transactions. 
+Les mesures effectuées pour le dataset 1 et 2 se sont donc limitées à la similarité et réutilisation de code et à l'identification des implémentations les plus populaires. 
+			\subsection{Jeux de données 1 et 2}
+			
+Sur TODO contrats analysés, TODO ont un code source associé sur Etherscan et TODO d'entre eux contiennent l'instruction delegatecall, 2462 ont été identifiés comme utilisant le pattern Proxy et forment le jeu de données 1.  	
+Sur TODO contrats analysés, créés entre entre le 01/01/2019 and 31/05/2019,  TODO ont un code source associé et TODO d'entre eux contiennent l'instruction delegatecall, 990 ont été identifiés comme utilisant le pattern Proxy et forment le jeu de données 2. 
 
-			\subsection{Similarité et réutilisation de code}
-Afin de pouvoir mesurer la proportion de code similaires dans les contrats collectés, une approche similaire aux travaux Norvill de et al. \cite{Norvill} a été utilisée. Plusieurs clusters ont ainsi été créés en utilisant la moyenne des distances mesurées entre les hashes ssdeep des bytecodes de chaque contrat.
-				\subsubsection{Encodage et mesure de distance}
+			\subsubsection{Similarité et réutilisation de code}
+Afin de pouvoir mesurer la proportion de code similaires dans les contrats collectés, une approche similaire aux travaux Norvill de et al. \cite{Norvill} a été utilisée. Plusieurs clusters ont ainsi été créés en utilisant la moyenne des distances mesurées entre les hashes ssdeep des bytecodes de chaque contrat. Le code utilisé est disponible en Annexe TODO 
+			\subsubsection{Encodage et mesure de distance}
                 \paragraph{ssdeep}
 Les contrats sont représentés par le hash CPTH (Context Triggered Piecewide Hash)\cite{kornblum2006identifying} (aussi appelé fuzzy hashing) de leur bytecode en utilisant l'algorithme ssdeep\cite{ssdeep}, qui a été créé à l'origine pour le détecteur de spam spamsum afin de détecter la similarité des fichiers.
- Ssdeep produit un hash non cryptographique, uniforme et non aléatoire ce qui nous permet de comparer la similarité des hash pour comparer celle des bytecodes. En effet, il permet de comparer des éléments ayant des séquences d'octets consécutives identiques méme si certains octets entre ces séquences ont été insérés, supprimés ou modifiés. Les arguments du constructeur des smart contracts étant ajoutés à la fin, gréce à ce hash, il ne sera donc pas nécessaire de les parser en pré-traitement.
-
-
-
+ Ssdeep produit un hash non cryptographique, uniforme et non aléatoire ce qui nous permet de comparer la similarité des hash pour comparer celle des bytecodes. En effet, il permet de comparer des éléments ayant des séquences d'octets consécutives identiques même si certains octets entre ces séquences ont été insérés, supprimés ou modifiés. Les arguments du constructeur des smart contracts étant ajoutés à la fin, grâce à ce hash, il ne sera donc pas nécessaire de les parser en pré-traitement.
+\\
+\\
 La distance utilisée est la moyenne des distances de Jaccard, Sorensen et Levenshtein, trois métriques couramment utilisées pour mesurer la similitude entre textes.
 
 \paragraph{Distance de Jaccard}
@@ -719,7 +779,7 @@ Cette distance donne moins de poids aux valeurs déviantes de l'ensemble de donné
 \paragraph{Distance de Levenshtein}
 La distance de Levenshtein donne une mesure de la différence entre deux chaénes de caractéres. Elle est égale au nombre minimal de caractéres qu'il faut supprimer, insérer ou remplacer pour passer d'une chaéne à l'autre.
 
-On utilise une version normalisée de la distance de Levenshtein afin de pouvoir effectuer la moyenne des trois distances, la valeur obtenue se situe donc entre 0 et 1, 0 signifiant que les hash sont totalement égaux. L'utilisation de la moyenne permet de réduire l'incertitude. La figure ci-dessous permet d'illustrer la nécessité d'une telle correction en comparant différents résultats obtenus suivant les algorithmes utilisés.
+On utilise une version normalisée de la distance de Levenshtein afin de pouvoir effectuer la moyenne des trois distances, la valeur obtenue se situe donc entre 0 et 1, 0 signifiant que les hash sont totalement égaux. L'utilisation de la moyenne permet de réduire l'incertitude. La tableau ci-dessous permet d'illustrer la nécessité d'une telle correction en comparant différents résultats obtenus suivant les algorithmes utilisés.
 
 \noindent\begin{tabular}{|p{2.5cm}||c|c|c|}
 \hline
@@ -737,42 +797,121 @@ $(1,2,3,4,5,6)$ $(1,2,3,4)$ & 0.333& 0.199 & 0.333\\
 \hline
 \end{tabular}
 
+On définit la fonction compute\_similarity(X) qui retourne la matrice des similarités calculée en soustrayant la moyenne de la matrice des distances à la matrice identité.
+ \begin{lstlisting}[language=Python,numbers=none]
+similarity_matrix = 1 - np.mean(np.array([ jaccard_matrix, sorensen_matrix, levenshtein_matrix ]), axis=0 )
+\end{lstlisting}
 
+On obtient donc une matrice de dimension nxn, avec n le nombres de contrats dans l'échantillon, symétrique, dont tous les coefficients sont entre 0 et 1 et dont la diagonale est égale à 1. 
 
-%TODOOn obtient donc la matrice des distances contenant les coefficients de similarité entre 0 et 1,
 				\subsubsection{Partitionnement des données}
-L'algorithme de propagation d'affinité \cite{frey2007clustering} a été utilisé pour partitionner les données. L'avantage de cet algorithme est qu'il identifie les éléments exemplaire parmi les données et sélectionne automatiquement le nombre de partitions en fonction des données qui lui sont fournis.
-TODO SCRIPT PYTHON
-			\subsection{Sécurité}
-kjj
+L'algorithme de propagation d'affinité (Affinity Propagation)  \cite{frey2007clustering} a été utilisé pour partitionner les données.
+
+L'avantage de cet algorithme est qu'il sélectionne automatiquement le nombre de partitions en fonction des éléments exemplaires trouvés. Un élément exemplaire est l'élément le plus significant d'une partition, i.e celui qui représente le mieux les autres membres de sa partition. La complexité de cette algorithme est de l'ordre de $O(N^{2}T)$ où $N$ est le nombre d'éléments et $T$ le nombre d'itération.
+On peut le modéliser comme un réseau où tous les éléments s'envoient des messages entre eux. Ces messages contiennent l'information qui permet de déterminer les éléments exemplaires. Ces messages sont stockés dans deux matrices :
+
+\begin{description}
+\item[Matrice de disponibilité $A(i,k)$ ] Elle contient les messages envoyés aux potentiels membres d'une partition par les potentiels éléments exemplaires. Elle indique l'adéquation de l'élément i à faire partie de la partition de k, en tenant compte des autres potentiels membres de la partition de k. 
+
+\item[Matrice de responsabilité $R(i,k)$ ] Elle contient les messages envoyés aux potentiels éléments exemplaires d'une partition par les potentiels membre de cette partition. Elle indique l'adéquation de l'élément k à être exemplaire pour i, en tenant compte des autres potentiels éléments exemplaires pour i. 
+\end{description}
+
+On utilise l'implémentation du module skikit.cluster de la librairie python scikit-learn pour effectuer nos mesures.
+
+ \begin{lstlisting}[language=Python,numbers=none]
+af = AffinityPropagation(affinity="precomputed", max_iter=4000, convergence_iter=400, preference=np.amin(similarity_matrix), damping=0.9)
+af.fit(similarity_matrix)
+ \end{lstlisting}
+ 
+ 
+L'algorithme prend en entrée la matrice des similarités et calcule de manière itérative la matrice de responsabilité en fonction de la matrice de disponibilité actuelle, de la matrice de similarité et des paramètres présentés ci-dessous, puis recalcule la matrice de disponibilité grâce à la nouvelle matrice de responsabilité. 
+
+ \begin{description}
+ \item[affinity] La valeur precomputed signifie que nous utilisons notre propre distance, par défaut la distance euclidienne est utilisée.
+\item[ max\_iter et convergence\_iter] L'algorithme s'arrête si les éléments exemplaires ne changent pas et le nombre de partitions continue de converger après convergence\_iter itérations ou si max\_iter itérations sont atteintes.
+\item[preference] La préference d'un élément représente sa capacité à servir d'élément exemplaire, plus elle est élevée, plus cet élément aura de chances d'être exemplaire. Elle peut être assignée à une valeur globale partagée ou à un tableau contenant autant de valeurs que d'éléments à partitionner, pour assigner des valeurs spécifiques à certains éléments. La préférence permet donc d'influencer le nombre de partitions. Une valeur globale élevée entrainera un nombre élevé de partitions tandis qu'une valeur basse entrainera un nombre plus modéré de partitions. On choisit donc généralement la valeur moyenne des similarités ou la valeur minimum selon le cas.  
+\item[damping] Ce paramètre permet d'éviter les oscillations lors du calcul des matrices de disponibilité et de responsabilité. Une valeur élevé ralentira la vitesse de convergence. 
+\end{description}
+ 
+Le paramètre preference a été choisi et le nombre de partitions attendues a été estimé en se basant sur le nombre de noms de contrats uniques. 
+On assigne à un contrat une préférence élevée lui permettant d'être choisi comme élément exemplaire tandis que tous les autres contrats portant le même nom se voient attribuer une valeur faible.
+ \begin{lstlisting}[language=Python,numbers=none]
+names = [ re.sub(r"\d+", "", name) for name in contract.name_list ]
+(unique_name, index_name) = np.unique(names, return_index=True)
+
+preference = np.full(2462, np.amin(similarity_matrix))
+for index in index_name:
+preference[index] = np.amax(similarity_matrix)
+\end{lstlisting}
+        
+
+47 noms de contrat uniques ont été trouvés pour chaque jeu de données.  53 et 54 partitions ont été formées les jeux de données 1 et 2 respectivement. 
+
+\begin{figure}
+  \includegraphics[scale=0.4]{figures/clusters_datasets.png}
+  \caption{Taille des 10 premières partitions des jeu de données 1 (gauche) et 2 (droite) }
+\end{figure}
+		\subsection{Jeu de données 3}
+Le tableau en Annexe TODO comporte les critères d'analyse des contrats du jeu de données 3, à savoir:
+\begin{itemize}
+\item le nom du contrat
+\item l'adresse du contrat
+\item la version du contrat
+\item la disponibilité du code source du contrat
+\item le nombre de transactions reçues (transactions "externes" uniquement, i.e émises par un EOA)
+\item le nombre d'utilisateurs uniques
+\item la première adresse de l'implémentation
+\item le nombre de mise à jour effectuées et pour chaque mise à jour: 
+\begin{itemize}
+\item la fonction utilisée
+\item le numéro de la transaction
+\item la date de la transaction
+\item la nouvelle adresse d'implémentation
+\item la disponibilité du code source de l'implémentation
+\end{itemize}
+
+\item l'organisation à l'origine du contrat
+\item l'utilité du contrat
+\item les bonnes pratiques utilisées, basées sur les recommandations présentées en section TODO
+\end{itemize}
+
+Ces données ont été récoltées en consultant les sites Etherscan et Bloxy, qui fournit davantage de statistiques et d'informations. 
+
+			\subsubsection{Usages}
+La quasi totalité des contrats d'implémentation observés sont des tokens.
+	Un token est un actif numérique émis et échangeable sur une blockchain.
+Il posséde plusieurs atouts:
+\begin{itemize}
+\item Il peut être transféré sur Internet sans duplication de pair-à-pair, de plus il a les caractéristiques des crypto-monnaies : infalsifiabilité, enregistrement des échanges dans un registre immuable, sécurité des échanges, etc.
+\item Il est personnalisable. Il peut représenter un droit d'usage d'un produit, un droit de vote, un droit d'auteur, une récompense, un moyen de paiement , une réputation, etc.
+\item Il peut être vendu et acheté à tout moment, en particulier sur des plateformes d'échange à un prix fixé en temps réel par l'offre et la demande.
+\end{itemize}
+Techniquement, les tokens sont créés et gérés par des smart contracts auxquels qui stockent les soldes des utilisateurs (un mapping entre leurs adresses et la quantité de tokens détenus) ainsi que des fonctions de transfert, dépôt et retrait.
+
+			\subsubsection{Sécurité}
+En terme de bonnes pratiques, 
+
+\subsection{Observations complémentaires}
+			
+			
 %----------------------------------------------------------------------------------------
-%	SECTION 4
+%	SECTION 2.5
 %----------------------------------------------------------------------------------------
 
 	\section{Conclusion}
 Futur possibilité : heuristique voir si contrat malicieux, determiner kel contrat est appelé, si le code source availale, sinon analyse du code source, clash collision,
 
-\begin{figure}[h]
-\begin{center}
-\caption{Figure caption.}
-\end{center}
-\end{figure}
-
-%----------------------------------------------------------------------------------------
-%	SECTION 5
-%----------------------------------------------------------------------------------------
-\section{Limitations et incertitude}
+\subsection{Limitations et incertitude}
 
 
 La source d'incertitude la plus évidente:  collecte des données
 delegatecall dans commentaire
-plusieurs contrat dans un seul source code redondance
 source code correspond pas au bytecode
 juste source code available mais en realité beaucoup plus
 pas toute la blockchain
 
 
-\section{Travaux connexes}
+\subsection{Travaux connexes}
 
 http://www.ccs.neu.edu/home/amislove/publications/Ethereum-IMC.pdf : In this paper, we examine how contracts in Ethereum are created,
 and how users and contracts interact with one another. We modify
@@ -786,6 +925,10 @@ reveals even further similarity. These results indicate that there is
 substantial code re-use in Ethereum, suggesting that bugs in such
 contracts could have wide-spread impact on the Ethereum user
 population
+
+\appendix
+\chapter{Annexe A}
+\chapter{Code Python: Récupération des contrats}
 
 
 
