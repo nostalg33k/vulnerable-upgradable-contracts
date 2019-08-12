@@ -1,4 +1,5 @@
 \documentclass{report}
+\usepackage[english,francais]{babel}
 \input{solidity-highlighting.tex}
 \usepackage{hyperref}
 \usepackage{siunitx} % Provides the \SI{}{} and \si{} command for typesetting SI units
@@ -24,7 +25,7 @@ letterpaper,
 \setlength\parindent{0pt} % Removes all indentation from paragraphs
 \usepackage[latin1]{inputenc} % un package
 \usepackage[T1]{fontenc}      % un second package
-\usepackage[francais]{babel}  % un troisiéme package
+ % un troisiéme package
 
 \renewcommand{\labelenumi}{\alph{enumi}.} % Make numbering in the enumerate environment by letter rather than number (e.g. section 6)
 
@@ -98,6 +99,8 @@ letterpaper,
 \renewcommand*\appendixautorefname{annexe}
 \renewcommand*\chapterautorefname{chapitre}
 \renewcommand*\subsectionautorefname{sous-section}
+\renewcommand*\appendixpagename{Annexes}
+\renewcommand*\appendixtocname{Annexes}
 
 
 
@@ -723,7 +726,7 @@ Les données de la blockchain Ethereum telles que les blocs, les logs, les contra
 
 La table \emph{contract} a été utilisée pour construire nos jeux de données. Il s'agit d'un sous-ensemble des contrats contenus dans la blockchain Ethereum, créé en Août 2018. La table contient actuellement 17 392 063 contrats et fait une taille de 18Go.
 
-Dans le code \emph{get\_contracts.py}, disponible en \autoref{app:codes} de l'annexe, on retrouve la fonction \emph{get\_contracts\_from\_bigQuery()} qui utilise la librairie python et l'API pour s'authentifier au service et effectuer des requêtes. En particulier la requête ci-dessous, utilisée pour récupérer les adresses de l'ensemble des contrats créés entre le 01/01/2019 to 31/05/2019 pour construire le jeu de données 2.
+Dans le code \emph{get\_contracts.py}, disponible en \autoref{app:code_s} de l'annexe, on retrouve la fonction \emph{get\_contracts\_from\_bigQuery()} qui utilise la librairie python et l'API pour s'authentifier au service et effectuer des requêtes. En particulier la requête ci-dessous, utilisée pour récupérer les adresses de l'ensemble des contrats créés entre le 01/01/2019 to 31/05/2019 pour construire le jeu de données 2.
 
  \begin{lstlisting}[language=SQL,numbers=none]
 SELECT address  FROM `bigquery-public-data.crypto_ethereum.contracts` 
@@ -909,7 +912,7 @@ preference[index] = np.amax(similarity_matrix)
 \end{figure}
 
 		\subsection{Jeu de données 3}
-Le tableau en annexe \autoref{20popular} comporte les critères d'analyse des contrats du jeu de données 3, à savoir:
+Les critères d'analyse des contrats du jeu de données 3 sont:
 \begin{itemize}
 \item le nom du contrat
 \item l'adresse du contrat
@@ -1142,12 +1145,11 @@ Pour résumer, la blockchain concentre trois technologies : une architecture dist
 
 \chapter{Codes}
 \section{Récupération du code source}
-\label{app:codes}
+\label{app:code_s}
+\input{codes}
 \section{Partitionnement des données}
-
+\input{codec}
 \label{app:codec}
-\chapter{Analyse de 20 contrats évolutifs parmi les plus populaires}
-\label{20popular}
 \end{appendices}
 
 %----------------------------------------------------------------------------------------
